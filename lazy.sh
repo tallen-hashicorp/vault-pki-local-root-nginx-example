@@ -8,8 +8,8 @@ vault secrets tune -max-lease-ttl=43800h pki_int
 
 # Generate an intermediate CA
 vault write -format=json pki_int/intermediate/generate/internal \
-     common_name="example.com Intermediate Authority" \
-     issuer_name="example-dot-com-intermediate" \
+     common_name="My Awsome Intermediate Authority" \
+     issuer_name="my-awsome-intermediate" \
      | jq -r '.data.csr' > pki_intermediate.csr
 
 # Sign the CSR
@@ -21,12 +21,6 @@ cat intermediate-cert.pem rootCA.crt > intermediate-bundle.pem
 vault write pki_int/intermediate/set-signed certificate=@intermediate-bundle.pem
 
 # Define roles for the intermediate CA
-vault write pki_int/roles/example-dot-com \
-     issuer_ref="$(vault read -field=default pki_int/config/issuers)" \
-     allowed_domains="example.com" \
-     allow_subdomains=true \
-     max_ttl="720h"
-
 vault write pki_int/roles/local-host \
      issuer_ref="$(vault read -field=default pki_int/config/issuers)" \
      allowed_domains="127.0.0.1,localhost" \
@@ -46,3 +40,12 @@ cat nginx_certificate.pem nginx_chain.pem > nginx_cert_chain.pem
 
 # Verify the newly issued certificate
 openssl verify -CAfile nginx_chain.pem nginx_certificate.pem
+
+echo "The Docker container build for the NGINX image is about to start. This will contain certs generated from Vault!"
+echo "You will be able to access it after at https://localhost."
+echo "You have 10 seconds to cancel (press Ctrl+C to cancel)..."
+
+sleep 10
+
+docker build -t vault-nginx .
+docker run --rm -p 80:80 -p 443:443 vault-nginx

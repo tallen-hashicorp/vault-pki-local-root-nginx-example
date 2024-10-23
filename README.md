@@ -38,8 +38,8 @@ vault secrets tune -max-lease-ttl=43800h pki_int
 
 # Generate an intermediate CA certificate signing request (CSR)
 vault write -format=json pki_int/intermediate/generate/internal \
-     common_name="example.com Intermediate Authority" \
-     issuer_name="example-dot-com-intermediate" \
+     common_name="My Awsome Intermediate Authority" \
+     issuer_name="my-awsome-intermediate" \
      | jq -r '.data.csr' > pki_intermediate.csr
 
 # Sign the CSR with the root CA
@@ -58,12 +58,6 @@ Next, define roles in Vault for your intermediate CA and request a certificate f
 
 ```bash
 # Define roles for the intermediate CA
-vault write pki_int/roles/example-dot-com \
-     issuer_ref="$(vault read -field=default pki_int/config/issuers)" \
-     allowed_domains="example.com" \
-     allow_subdomains=true \
-     max_ttl="720h"
-
 vault write pki_int/roles/local-host \
      issuer_ref="$(vault read -field=default pki_int/config/issuers)" \
      allowed_domains="127.0.0.1,localhost" \
@@ -100,3 +94,5 @@ docker run --rm -p 80:80 -p 443:443 vault-nginx
 # Alternatively, run a shell in the NGINX container for debugging
 docker run --rm -it -p 80:80 -p 443:443 vault-nginx /bin/sh
 ```
+
+Now vist [https://localhost](https://localhost)
