@@ -1,5 +1,7 @@
 # Vault PKI Local Root NGINX Example
 
+> **Note:** Please manually complete **Step 1** to create the Root Certificate Authority (CA). After that, you can simply run the `./lazy.sh` script to continue with the remaining steps.
+
 ## Overview
 This guide outlines the steps to create a Root Certificate Authority (CA), configure an Intermediate CA in HashiCorp Vault, define roles, and generate certificates for use with NGINX.
 
@@ -25,6 +27,8 @@ To trust your newly created root CA, add `rootCA.crt` to your system's trust key
 5. Set the certificate to **Always Trust**.
 
 Your laptop will now trust anything that this CA signs.
+
+---
 
 ## Step 2: Create an Intermediate CA in Vault
 Ensure you have Vault running and accessible. If you want to automate this, you can run `./lazy.sh`.
